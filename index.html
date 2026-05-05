@@ -1,0 +1,269 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Surprise Card</title>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Fredoka+One&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --card-red: #e62020;
+            --text-pink: #ff9ec6;
+            --bg-color: #f7f2ed;
+        }
+
+        /* RESET to ensure full screen usage */
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--bg-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            font-family: 'Fredoka One', cursive;
+        }
+
+        /* --- THE CARD CONTAINER --- */
+        .scene {
+            /* 90vw means 90% of the screen width - VERY BIG */
+            width: 90vw;
+            /* Keeps the rectangle shape correct */
+            aspect-ratio: 5 / 7;
+            /* Prevents it from being taller than the screen */
+            max-height: 90vh;
+            position: relative;
+            perspective: 2500px;
+            z-index: 1;
+        }
+
+        /* --- STATIC INSIDE LAYER (Mirror Side) --- */
+        .card-inside {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--card-red);
+            border-radius: 0 15px 15px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 5%;
+            z-index: 1;
+            box-shadow: inset 5px 0 20px rgba(0,0,0,0.1);
+        }
+
+        /* --- MOVING FRONT COVER --- */
+        .card-cover {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transform-origin: left;
+            transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+            z-index: 10;
+            border-radius: 0 15px 15px 0;
+            cursor: pointer;
+            box-shadow: 15px 10px 40px rgba(0,0,0,0.4);
+        }
+
+        /* Open Animation */
+        .card-cover.is-open {
+            transform: rotateY(-180deg);
+        }
+
+        /* --- SIDES OF THE COVER (Fixes Ghosting) --- */
+        
+        /* 1. The Design Front */
+        .face-front {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: var(--card-red);
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            border-radius: 0 15px 15px 0;
+        }
+
+        /* 2. The Solid Back (THIS FIXES THE GHOSTING GLITCH) */
+        .face-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: var(--card-red); 
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            transform: rotateY(180deg);
+            border-radius: 15px 0 0 15px;
+            z-index: 1;
+        }
+
+        /* --- RESPONSIVE TEXT --- */
+        .text-meet {
+            font-family: 'Caveat', cursive;
+            font-size: 8vw; 
+            color: white;
+            margin-bottom: 2vh;
+        }
+
+        .text-future {
+            font-size: 14vw;
+            color: white;
+            line-height: 0.9;
+            /* Polka Dot Style */
+            background-image: radial-gradient(var(--card-red) 25%, transparent 26%);
+            background-size: 6px 6px;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-color: white; 
+            filter: drop-shadow(0 2px 0 rgba(0,0,0,0.1));
+        }
+
+        .text-darling {
+            font-size: 18vw;
+            color: var(--text-pink);
+            line-height: 0.8;
+            margin-top: -1vh;
+            /* White Dot Style */
+            background-image: radial-gradient(white 20%, transparent 21%);
+            background-size: 10px 10px;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-color: var(--text-pink);
+            filter: drop-shadow(4px 4px 0 #b31414);
+        }
+
+        /* --- MIRROR PAGE ELEMENTS --- */
+        .text-cute {
+            font-size: 8vw;
+            color: white;
+            text-align: center;
+            line-height: 1.1;
+            margin-top: 1vh;
+        }
+
+        .mirror-container {
+            width: 80%;
+            height: 55%;
+            background: white;
+            border: 5px solid white;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            overflow: hidden;
+            position: relative;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1); /* Mirror Flip */
+            background: #000;
+        }
+
+        .text-bottom {
+            font-size: 3.5vw;
+            color: white;
+            text-align: center;
+            text-transform: uppercase;
+            line-height: 1.4;
+            margin-bottom: 2vh;
+        }
+
+        /* --- CLOSE BUTTON --- */
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            font-family: sans-serif;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scene">
+        <div class="card-inside">
+            <div class="close-btn" onclick="toggleCard()">Close ✕</div>
+
+            <div class="text-cute">CUTE,<br>huh?</div>
+            
+            <div class="mirror-container">
+                <video id="webcam" autoplay playsinline muted></video>
+            </div>
+
+            <div class="text-bottom">
+                To me, you'll always be the cutest.<br>
+                even at 80, with dentures and all.
+            </div>
+        </div>
+
+        <div class="card-cover" id="cover" onclick="toggleCard()">
+            <div class="face-front">
+                <div class="text-meet">♥ meet my ♥</div>
+                <div class="text-future">FUTURE</div>
+                <div class="text-darling">Darling</div>
+            </div>
+            <div class="face-back"></div>
+        </div>
+    </div>
+
+    <script>
+        const cover = document.getElementById('cover');
+        const video = document.getElementById('webcam');
+        let stream = null;
+
+        async function toggleCard() {
+            const isOpen = cover.classList.contains('is-open');
+
+            if (!isOpen) {
+                // OPEN THE CARD
+                cover.classList.add('is-open');
+                
+                // CAMERA LOGIC
+                try {
+                    stream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { facingMode: "user" }, 
+                        audio: false 
+                    });
+                    video.srcObject = stream;
+                } catch (err) {
+                    console.log("Camera access error");
+                }
+            } else {
+                // CLOSE THE CARD
+                cover.classList.remove('is-open');
+                
+                // STOP CAMERA
+                setTimeout(() => {
+                    if (stream) {
+                        stream.getTracks().forEach(track => track.stop());
+                        video.srcObject = null;
+                        stream = null;
+                    }
+                }, 500);
+            }
+        }
+    </script>
+</body>
+</html>
